@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trắc nghiệm: Image, Kernel & Gauss-Jordan</title>
+
+<!-- MathJax 3 -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']],
+      processEscapes: true
+    },
+    svg: { fontCache: 'global' },
+    startup: {
+      ready: () => {
+        MathJax.startup.defaultReady();
+      }
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+    color: #333;
+  }
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    overflow: hidden;
+  }
+  .header {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: #fff;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+  .header h1 { font-size: 28px; margin-bottom: 8px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+  .header p { font-size: 14px; opacity: 0.95; }
+  .stats {
+    display: flex;
+    justify-content: space-around;
+    padding: 15px;
+    background: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
+  }
+  .stat-box {
+    text-align: center;
+    padding: 10px 20px;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    min-width: 100px;
+  }
+  .stat-box .label { font-size: 12px; color: #666; text-transform: uppercase; }
+  .stat-box .value { font-size: 22px; font-weight: bold; color: #f5576c; margin-top: 4px; }
+  .progress-bar {
+    height: 8px;
+    background: #e9ecef;
+    position: relative;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+  .question-area { padding: 30px; min-height: 400px; }
+  .question-tag {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 15px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  }
+  .tag-theory { background: linear-gradient(135deg, #43cea2, #185a9d); }
+  .tag-easy { background: linear-gradient(135deg, #56ab2f, #a8e063); }
+  .tag-medium { background: linear-gradient(135deg, #f7971e, #ffd200); }
+  .tag-hard { background: linear-gradient(135deg, #cb2d3e, #ef473a); }
+  .question-text {
+    font-size: 17px;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    padding: 18px;
+    background: #f8f9fa;
+    border-left: 5px solid #667eea;
+    border-radius: 8px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+  }
+  .options { display: flex; flex-direction: column; gap: 12px; }
+  .option {
+    padding: 15px 20px;
+    background: #fff;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-size: 15px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+    display: flex;
+    align-items: center;
+  }
+  .option:hover:not(.disabled) {
+    transform: translateX(5px);
+    border-color: #667eea;
+    background: #f0f4ff;
+    box-shadow: 0 5px 15px rgba(102,126,234,0.2);
+  }
+  .option .letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    font-weight: bold;
+    margin-right: 15px;
+    flex-shrink: 0;
+  }
+  .option.correct {
+    background: linear-gradient(135deg, #d4fc79, #96e6a1);
+    border-color: #28a745;
+    color: #155724;
+  }
+  .option.wrong {
+    background: linear-gradient(135deg, #ffcccc, #ff9999);
+    border-color: #dc3545;
+    color: #721c24;
+  }
+  .option.disabled { cursor: not-allowed; opacity: 0.85; }
+  .explanation {
+    margin-top: 20px;
+    padding: 18px;
+    background: linear-gradient(135deg, #fff5e6, #ffe0b3);
+    border-left: 5px solid #f7971e;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.7;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    display: none;
+  }
+  .explanation.show { display: block; animation: fadeIn 0.4s ease; }
+  .explanation strong { color: #d35400; }
+  @keyframes fadeIn { from {opacity:0; transform:translateY(-10px);} to {opacity:1; transform:translateY(0);} }
+  .nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 30px;
+    background: #f8f9fa;
+    border-top: 2px solid #e9ecef;
+  }
+  .btn {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 25px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .btn-prev { background: linear-gradient(135deg, #a8c0ff, #3f2b96); color: #fff; }
+  .btn-next { background: linear-gradient(135deg, #4facfe, #00f2fe); color: #fff; }
+  .btn-reset { background: linear-gradient(135deg, #f093fb, #f5576c); color: #fff; }
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.25); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .result-screen {
+    text-align: center;
+    padding: 40px 30px;
+    display: none;
+  }
+  .result-screen.show { display: block; }
+  .result-screen h2 {
+    font-size: 32px;
+    margin-bottom: 15px;
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .score-circle {
+    width: 180px;
+    height: 180px;
+    margin: 20px auto;
+    border-radius: 50%;
+    background: conic-gradient(#4facfe 0deg, #e9ecef 0deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    position: relative;
+  }
+  .score-inner {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .score-inner .num { font-size: 40px; font-weight: bold; color: #667eea; }
+  .score-inner .lbl { font-size: 13px; color: #888; }
+  .category-summary {
+    margin-top: 20px;
+    text-align: left;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+  }
+  .category-summary h3 { margin-bottom: 12px; color: #667eea; }
+  .cat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dashed #ddd;
+  }
+  /* Đảm bảo MathJax không bị tràn */
+  mjx-container { overflow-x: auto; max-width: 100%; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>📐 Trắc nghiệm: Image, Kernel & Gauss-Jordan</h1>
+    <p>Đại số tuyến tính • 14 câu hỏi • Lý thuyết & Bài tập</p>
+  </div>
+  <div class="stats">
+    <div class="stat-box"><div class="label">Câu hỏi</div><div class="value" id="qNum">1/14</div></div>
+    <div class="stat-box"><div class="label">Đúng</div><div class="value" id="correctCount">0</div></div>
+    <div class="stat-box"><div class="label">Sai</div><div class="value" id="wrongCount">0</div></div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+  <div class="question-area" id="questionArea"></div>
+
+  <div class="result-screen" id="resultScreen">
+    <h2>🎉 Hoàn thành bài kiểm tra!</h2>
+    <div class="score-circle" id="scoreCircle">
+      <div class="score-inner">
+        <div class="num" id="finalScore">0</div>
+        <div class="lbl">trên 14 câu</div>
+      </div>
+    </div>
+    <p id="finalMsg" style="font-size:16px; margin:15px 0; color:#555;"></p>
+    <div class="category-summary" id="categorySummary"></div>
+    <button class="btn btn-reset" onclick="resetQuiz()" style="margin-top:20px;">🔄 Làm lại</button>
+  </div>
+
+  <div class="nav-buttons">
+    <button class="btn btn-prev" id="prevBtn" onclick="prevQuestion()">← Trước</button>
+    <button class="btn btn-next" id="nextBtn" onclick="nextQuestion()">Tiếp →</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  // ===== 3 LÝ THUYẾT =====
+  {
+    category: 'theory', tag: 'Lý thuyết', tagClass: 'tag-theory',
+    text: 'Kernel (hay Null space) của ma trận \\(A\\), ký hiệu \\(\\ker(A)\\), được định nghĩa là:',
+    options: [
+      'Tập hợp các vector \\(\\mathbf{x}\\) sao cho \\(A\\mathbf{x} = \\mathbf{0}\\)',
+      'Tập hợp các vector \\(\\mathbf{x}\\) sao cho \\(A\\mathbf{x} = \\mathbf{x}\\)',
+      'Tập hợp tất cả các vector cột của \\(A\\)',
+      'Tập hợp các vector riêng của \\(A\\)'
+    ],
+    answer: 0,
+    explain: '<strong>Định nghĩa:</strong> \\(\\ker(A) = \\{\\mathbf{x} \\mid A\\mathbf{x} = \\mathbf{0}\\}\\). Đây là tập các vector bị ma trận \\(A\\) "biến thành" vector \\(\\mathbf{0}\\). Một số sách ký hiệu là \\(\\text{Null}(A)\\) — đều cùng một khái niệm.'
+  },
+  {
+    category: 'theory', tag: 'Lý thuyết', tagClass: 'tag-theory',
+    text: 'Image của ma trận \\(A\\), ký hiệu \\(\\text{Im}(A)\\), được xác định như thế nào khi đã có ma trận bậc thang rút gọn (RREF)?',
+    options: [
+      'Là \\(\\text{span}\\) của các vector cột ở ma trận RREF tương ứng các cột chứa pivot',
+      'Là \\(\\text{span}\\) của các vector cột ở ma trận \\(A\\) ban đầu tương ứng các cột chứa pivot',
+      'Là \\(\\text{span}\\) của tất cả các vector cột của \\(A\\)',
+      'Là \\(\\text{span}\\) của các vector hàng của RREF'
+    ],
+    answer: 1,
+    explain: '<strong>Chú ý quan trọng:</strong> \\(\\text{Im}(A)\\) được sinh bởi các cột của <em>ma trận \\(A\\) ban đầu</em> (chứ không phải RREF), tại các vị trí cột chứa pivot. Các phép biến đổi hàng làm thay đổi không gian cột!'
+  },
+  {
+    category: 'theory', tag: 'Lý thuyết', tagClass: 'tag-theory',
+    text: 'Định lý Rank–Nullity phát biểu rằng, với ma trận \\(A\\) có \\(n\\) cột:',
+    options: [
+      '\\(\\dim(\\ker A) \\times \\dim(\\text{Im}\\, A) = n\\)',
+      '\\(\\dim(\\ker A) + \\dim(\\text{Im}\\, A) = n\\)',
+      '\\(\\dim(\\ker A) - \\dim(\\text{Im}\\, A) = n\\)',
+      '\\(\\dim(\\ker A) + \\dim(\\text{Im}\\, A) = \\) số hàng của \\(A\\)'
+    ],
+    answer: 1,
+    explain: '<strong>Định lý Rank–Nullity:</strong> \\(\\dim(\\ker A) + \\dim(\\text{Im}\\, A) = n\\) (số cột). Trong ví dụ bài giảng: \\(2 + 3 = 5\\) cột. Đây là một trong những định lý đẹp nhất của đại số tuyến tính!'
+  },
+
+  // ===== 5 BÀI TẬP DỄ =====
+  {
+    category: 'easy', tag: 'Dễ', tagClass: 'tag-easy',
+    text: 'Cho ma trận \\(A = \\begin{bmatrix} 1 & 2 & 3 \\\\ 0 & 1 & 4 \\end{bmatrix}\\). Số chiều của \\(\\text{Im}(A)\\) bằng bao nhiêu?',
+    options: ['1', '2', '3', '0'],
+    answer: 1,
+    explain: 'Ma trận đã ở dạng bậc thang, có 2 pivot (ở cột 1 và cột 2). Vậy \\(\\text{rank}(A) = \\dim(\\text{Im}\\, A) = 2\\).'
+  },
+  {
+    category: 'easy', tag: 'Dễ', tagClass: 'tag-easy',
+    text: 'Trong quá trình Gauss–Jordan, "pivot number" của một hàng được hiểu là:',
+    options: [
+      'Phần tử cuối cùng khác 0 của hàng',
+      'Phần tử đầu tiên khác 0 (tính từ trái sang) của hàng',
+      'Phần tử lớn nhất của hàng',
+      'Phần tử ở đường chéo chính'
+    ],
+    answer: 1,
+    explain: 'Pivot number là phần tử <strong>đầu tiên khác 0</strong> (từ trái sang) trên hàng đó. Trong RREF, mỗi pivot phải bằng \\(1\\) và là số khác 0 duy nhất trên cột của nó.'
+  },
+  {
+    category: 'easy', tag: 'Dễ', tagClass: 'tag-easy',
+    text: 'Ma trận \\(A\\) có kích thước \\(3 \\times 5\\), \\(\\text{rank}(A) = 2\\). Hỏi \\(\\dim(\\ker A)\\) bằng bao nhiêu?',
+    options: ['2', '3', '5', '1'],
+    answer: 1,
+    explain: 'Theo Rank–Nullity: \\(\\dim(\\ker A) = n - \\text{rank}(A) = 5 - 2 = 3\\). Vậy \\(\\ker(A)\\) có 3 biến tự do.'
+  },
+  {
+    category: 'easy', tag: 'Dễ', tagClass: 'tag-easy',
+    text: 'Cho RREF của \\(A\\) là \\(\\begin{bmatrix} 1 & 0 & 2 \\\\ 0 & 1 & -1 \\\\ 0 & 0 & 0 \\end{bmatrix}\\). Biến tự do của hệ \\(A\\mathbf{x} = \\mathbf{0}\\) là:',
+    options: ['\\(x_1\\)', '\\(x_2\\)', '\\(x_3\\)', 'Không có biến tự do'],
+    answer: 2,
+    explain: 'Pivot ở cột 1 và 2 → \\(x_1, x_2\\) là biến cơ sở. Cột 3 không có pivot → \\(x_3\\) là biến tự do. Vậy \\(\\dim(\\ker A) = 1\\).'
+  },
+  {
+    category: 'easy', tag: 'Dễ', tagClass: 'tag-easy',
+    text: 'Phép biến đổi sơ cấp nào <strong>bảo toàn</strong> \\(\\ker(A)\\)?',
+    options: [
+      'Nhân một hàng với số khác 0',
+      'Đổi chỗ hai hàng',
+      'Cộng một hàng với bội của hàng khác',
+      'Tất cả các phép biến đổi hàng sơ cấp đều bảo toàn \\(\\ker(A)\\)'
+    ],
+    answer: 3,
+    explain: 'Các phép biến đổi hàng sơ cấp <strong>bảo toàn \\(\\ker(A)\\)</strong> (vì nghiệm của \\(A\\mathbf{x}=\\mathbf{0}\\) không đổi). Tuy nhiên, chúng <strong>không bảo toàn \\(\\text{Im}(A)\\) theo từng vector cột</strong> — đó là lý do ta phải lấy cột pivot từ ma trận \\(A\\) <em>ban đầu</em>.'
+  },
+
+  // ===== 3 BÀI TẬP TRUNG BÌNH =====
+  {
+    category: 'medium', tag: 'Trung bình', tagClass: 'tag-medium',
+    text: 'Cho \\(A = \\begin{bmatrix} 1 & 2 & 3 \\\\ 2 & 4 & 6 \\\\ 1 & 1 & 1 \\end{bmatrix}\\). Tìm \\(\\dim(\\ker A)\\) và \\(\\dim(\\text{Im}\\, A)\\).',
+    options: [
+      '\\(\\dim(\\ker)=0,\\; \\dim(\\text{Im})=3\\)',
+      '\\(\\dim(\\ker)=1,\\; \\dim(\\text{Im})=2\\)',
+      '\\(\\dim(\\ker)=2,\\; \\dim(\\text{Im})=1\\)',
+      '\\(\\dim(\\ker)=3,\\; \\dim(\\text{Im})=0\\)'
+    ],
+    answer: 1,
+    explain: 'Hàng 2 = \\(2 \\times\\) hàng 1 → phụ thuộc tuyến tính. RREF có 2 pivot (cột 1, cột 2). Vậy \\(\\text{rank} = 2\\), \\(\\dim(\\text{Im}) = 2\\), \\(\\dim(\\ker) = 3 - 2 = 1\\).'
+  },
+  {
+    category: 'medium', tag: 'Trung bình', tagClass: 'tag-medium',
+    text: 'Cho \\(A = \\begin{bmatrix} 1 & 0 & 2 \\\\ 0 & 1 & -3 \\end{bmatrix}\\) đã là RREF. Một vector cơ sở của \\(\\ker(A)\\) là:',
+    options: [
+      '\\(\\begin{bmatrix} 2 \\\\ -3 \\\\ 1 \\end{bmatrix}\\)',
+      '\\(\\begin{bmatrix} 2 \\\\ 3 \\\\ 1 \\end{bmatrix}\\)',
+      '\\(\\begin{bmatrix} -2 \\\\ 3 \\\\ 1 \\end{bmatrix}\\)',
+      '\\(\\begin{bmatrix} 1 \\\\ 0 \\\\ 0 \\end{bmatrix}\\)'
+    ],
+    answer: 2,
+    explain: 'Từ RREF: \\(x_1 + 2x_3 = 0,\\; x_2 - 3x_3 = 0\\). Đặt \\(x_3 = t\\) → \\(x_1 = -2t,\\; x_2 = 3t\\). Vector cơ sở: \\(\\begin{bmatrix} -2 \\\\ 3 \\\\ 1 \\end{bmatrix}\\). Kiểm tra: \\(A\\begin{bmatrix} -2 \\\\ 3 \\\\ 1 \\end{bmatrix} = \\begin{bmatrix} -2+0+2 \\\\ 0+3-3 \\end{bmatrix} = \\begin{bmatrix} 0 \\\\ 0 \\end{bmatrix}\\) ✓.'
+  },
+  {
+    category: 'medium', tag: 'Trung bình', tagClass: 'tag-medium',
+    text: 'Ma trận \\(A\\) (\\(3 \\times 4\\)) có RREF = \\(\\begin{bmatrix} 1 & 0 & -1 & 2 \\\\ 0 & 1 & 3 & -1 \\\\ 0 & 0 & 0 & 0 \\end{bmatrix}\\). Số vector độc lập tuyến tính tối thiểu cần để sinh \\(\\ker(A)\\) là:',
+    options: ['1', '2', '3', '4'],
+    answer: 1,
+    explain: 'Có 4 cột, 2 pivot → 2 biến tự do (\\(x_3, x_4\\)). Vậy \\(\\dim(\\ker A) = 2\\), cần 2 vector độc lập tuyến tính để sinh \\(\\ker(A)\\).'
+  },
+
+  // ===== 3 BÀI TẬP KHÓ =====
+  {
+    category: 'hard', tag: 'Khó', tagClass: 'tag-hard',
+    text: 'Cho \\(A = \\begin{bmatrix} 1 & 3 & 5 & 3 & 0 \\\\ 2 & 1 & 0 & 1 & 1 \\\\ 1 & 2 & 3 & 2 & -2 \\end{bmatrix}\\) (ma trận trong bài giảng). Sau bước khử đầu tiên, hàng 2 trở thành \\([0,\\; 5,\\; 10,\\; 5,\\; -1]\\). Phép biến đổi nào đã được thực hiện?',
+    options: [
+      '\\(H_2 \\leftarrow H_2 - 2H_1\\)',
+      '\\(H_2 \\leftarrow 2H_1 - H_2\\)',
+      '\\(H_2 \\leftarrow H_2 - H_1\\)',
+      '\\(H_2 \\leftarrow H_1 - 2H_2\\)'
+    ],
+    answer: 1,
+    explain: 'Theo bài giảng: "nhân dòng đầu với 2 rồi trừ dòng thứ hai" → \\(H_2^{\\text{mới}} = 2H_1 - H_2\\).<br>Kiểm tra: \\(2[1,3,5,3,0] - [2,1,0,1,1] = [0,\\; 5,\\; 10,\\; 5,\\; -1]\\) ✓. Đáp án <strong>B</strong>.'
+  },
+  {
+    category: 'hard', tag: 'Khó', tagClass: 'tag-hard',
+    text: 'Với ma trận \\(A\\) ở câu trên (\\(3 \\times 5\\)), sau khi tìm được RREF, biết pivot ở cột 1, 2, 4. Phát biểu nào <strong>SAI</strong>?',
+    options: [
+      '\\(\\text{Im}(A) = \\text{span}\\) của cột 1, 2, 4 của ma trận \\(A\\) ban đầu',
+      '\\(\\text{rank}(A) = 3\\)',
+      '\\(\\dim(\\ker A) = 2\\)',
+      '\\(\\text{Im}(A) = \\text{span}\\) của cột 1, 2, 4 của ma trận RREF'
+    ],
+    answer: 3,
+    explain: 'Câu D sai vì các phép biến đổi hàng <strong>làm thay đổi không gian cột</strong>. \\(\\text{Im}(A)\\) phải lấy từ cột của ma trận <em>\\(A\\) ban đầu</em>, không phải RREF. Các câu A, B, C đều đúng.'
+  },
+  {
+    category: 'hard', tag: 'Khó', tagClass: 'tag-hard',
+    text: 'Cho \\(A = \\begin{bmatrix} 1 & 2 & 0 & 1 \\\\ 0 & 0 & 1 & 3 \\\\ 2 & 4 & 1 & 5 \\end{bmatrix}\\). Tìm cơ sở của \\(\\ker(A)\\) và \\(\\text{Im}(A)\\).',
+    options: [
+      '\\(\\ker\\): \\(\\left\\{ \\begin{bmatrix} -2 \\\\ 1 \\\\ 0 \\\\ 0 \\end{bmatrix}, \\begin{bmatrix} -1 \\\\ 0 \\\\ -3 \\\\ 1 \\end{bmatrix} \\right\\}\\); \\(\\text{Im}\\): {cột 1, cột 3 của \\(A\\)}',
+      '\\(\\ker\\): \\(\\left\\{ \\begin{bmatrix} 2 \\\\ -1 \\\\ 0 \\\\ 0 \\end{bmatrix} \\right\\}\\); \\(\\text{Im}\\): {cột 1, cột 2, cột 3 của \\(A\\)}',
+      '\\(\\ker\\): \\(\\left\\{ \\begin{bmatrix} -2 \\\\ 1 \\\\ -3 \\\\ 0 \\end{bmatrix} \\right\\}\\); \\(\\text{Im}\\): {cột 1, cột 3 của \\(A\\)}',
+      '\\(\\ker\\): \\(\\left\\{ \\begin{bmatrix} -2 \\\\ 1 \\\\ 0 \\\\ 0 \\end{bmatrix}, \\begin{bmatrix} 1 \\\\ 0 \\\\ 3 \\\\ -1 \\end{bmatrix} \\right\\}\\); \\(\\text{Im}\\): {cột 1, cột 2, cột 3 của \\(A\\)}'
+    ],
+    answer: 0,
+    explain: 'RREF: \\(H_3 \\leftarrow H_3 - 2H_1 - H_2 = [0,0,0,0]\\). Pivot ở cột 1, 3. Biến tự do: \\(x_2, x_4\\).<br>• Đặt \\(x_2=s,\\; x_4=t\\) → \\(x_1 = -2s - t,\\; x_3 = -3t\\).<br>• Vector cơ sở \\(\\ker\\): \\(s\\begin{bmatrix} -2 \\\\ 1 \\\\ 0 \\\\ 0 \\end{bmatrix} + t\\begin{bmatrix} -1 \\\\ 0 \\\\ -3 \\\\ 1 \\end{bmatrix}\\) ✓<br>• \\(\\text{Im}(A) = \\text{span}\\){cột 1, cột 3 của \\(A\\)} (vì pivot ở cột 1 và 3). Đáp án <strong>A</strong>.'
+  }
+];
+
+let currentQ = 0;
+let userAnswers = new Array(questions.length).fill(null);
+
+function typesetMath() {
+  if (window.MathJax && MathJax.typesetPromise) {
+    MathJax.typesetPromise().catch(err => console.log('MathJax error:', err));
+  }
+}
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  const area = document.getElementById('questionArea');
+  let html = `<span class="question-tag ${q.tagClass}">${q.tag}</span>`;
+  html += `<div class="question-text"><strong>Câu ${currentQ+1}:</strong> ${q.text}</div>`;
+  html += `<div class="options">`;
+  const letters = ['A', 'B', 'C', 'D'];
+  q.options.forEach((opt, i) => {
+    let cls = 'option';
+    if (userAnswers[currentQ] !== null) {
+      cls += ' disabled';
+      if (i === q.answer) cls += ' correct';
+      else if (i === userAnswers[currentQ]) cls += ' wrong';
+    }
+    html += `<div class="${cls}" onclick="selectAnswer(${i})" data-idx="${i}">
+      <span class="letter">${letters[i]}</span>
+      <span>${opt}</span>
+    </div>`;
+  });
+  html += `</div>`;
+  html += `<div class="explanation ${userAnswers[currentQ] !== null ? 'show' : ''}" id="explainBox">${q.explain}</div>`;
+  area.innerHTML = html;
+  typesetMath();
+  updateStats();
+}
+
+function selectAnswer(idx) {
+  if (userAnswers[currentQ] !== null) return;
+  userAnswers[currentQ] = idx;
+  renderQuestion();
+}
+
+function updateStats() {
+  document.getElementById('qNum').textContent = `${currentQ+1}/${questions.length}`;
+  const answered = userAnswers.filter(a => a !== null).length;
+  const correct = userAnswers.filter((a,i) => a === questions[i].answer).length;
+  const wrong = answered - correct;
+  document.getElementById('correctCount').textContent = correct;
+  document.getElementById('wrongCount').textContent = wrong;
+  document.getElementById('progressFill').style.width = `${(answered/questions.length)*100}%`;
+  document.getElementById('prevBtn').disabled = currentQ === 0;
+  const allAnswered = userAnswers.every(a => a !== null);
+  if (currentQ === questions.length - 1 && allAnswered) {
+    document.getElementById('nextBtn').textContent = '🏁 Xem kết quả';
+  } else {
+    document.getElementById('nextBtn').textContent = 'Tiếp →';
+  }
+}
+
+function nextQuestion() {
+  const allAnswered = userAnswers.every(a => a !== null);
+  if (currentQ === questions.length - 1 && allAnswered) {
+    showResult();
+    return;
+  }
+  if (currentQ < questions.length - 1) {
+    currentQ++;
+    renderQuestion();
+  }
+}
+
+function prevQuestion() {
+  if (currentQ > 0) {
+    currentQ--;
+    renderQuestion();
+  }
+}
+
+function showResult() {
+  document.getElementById('questionArea').style.display = 'none';
+  document.querySelector('.nav-buttons').style.display = 'none';
+  const rs = document.getElementById('resultScreen');
+  rs.classList.add('show');
+  const correct = userAnswers.filter((a,i) => a === questions[i].answer).length;
+  document.getElementById('finalScore').textContent = correct;
+  const pct = (correct/questions.length)*100;
+  document.getElementById('scoreCircle').style.background = `conic-gradient(#4facfe 0deg, #4facfe ${pct*3.6}deg, #e9ecef ${pct*3.6}deg)`;
+  let msg = '';
+  if (pct >= 90) msg = '🌟 Xuất sắc! Bạn nắm rất vững kiến thức!';
+  else if (pct >= 70) msg = '👍 Khá tốt! Ôn thêm phần sai là hoàn hảo.';
+  else if (pct >= 50) msg = '💪 Khá ổn, cần luyện tập thêm bài tập khó.';
+  else msg = '📚 Hãy xem lại lý thuyết và làm thêm bài tập nhé!';
+  document.getElementById('finalMsg').textContent = msg;
+
+  // Category summary
+  const cats = {theory: {name: '📘 Lý thuyết', total: 0, correct: 0},
+                easy: {name: '🟢 Bài tập Dễ', total: 0, correct: 0},
+                medium: {name: '🟡 Bài tập Trung bình', total: 0, correct: 0},
+                hard: {name: '🔴 Bài tập Khó', total: 0, correct: 0}};
+  questions.forEach((q,i) => {
+    cats[q.category].total++;
+    if (userAnswers[i] === q.answer) cats[q.category].correct++;
+  });
+  let sumHtml = '<h3>📊 Thống kê theo nhóm</h3>';
+  for (const k in cats) {
+    const c = cats[k];
+    sumHtml += `<div class="cat-row"><span>${c.name}</span><span><strong>${c.correct}/${c.total}</strong></span></div>`;
+  }
+  document.getElementById('categorySummary').innerHTML = sumHtml;
+}
+
+function resetQuiz() {
+  currentQ = 0;
+  userAnswers = new Array(questions.length).fill(null);
+  document.getElementById('questionArea').style.display = 'block';
+  document.querySelector('.nav-buttons').style.display = 'flex';
+  document.getElementById('resultScreen').classList.remove('show');
+  renderQuestion();
+}
+
+renderQuestion();
+</script>
+</body>
+</html>
