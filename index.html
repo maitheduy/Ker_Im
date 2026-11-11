@@ -14,6 +14,9 @@
       processEscapes: true
     },
     svg: { fontCache: 'global' },
+    options: {
+      enableMenu: false
+    },
     startup: {
       ready: () => {
         MathJax.startup.defaultReady();
@@ -30,156 +33,206 @@
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     padding: 20px;
-    color: #333;
+    color: #0f0f0f;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   .container {
     max-width: 900px;
     margin: 0 auto;
-    background: #fff;
+    background: #ffffff;
     border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
     overflow: hidden;
   }
   .header {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    color: #fff;
+    background: linear-gradient(135deg, #d63384 0%, #6f42c1 100%);
+    color: #ffffff;
     padding: 30px;
     text-align: center;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
   }
-  .header h1 { font-size: 28px; margin-bottom: 8px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
-  .header p { font-size: 14px; opacity: 0.95; }
+  .header h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.5), 0 0 2px rgba(0,0,0,0.3);
+    letter-spacing: 0.3px;
+  }
+  .header p {
+    font-size: 14px;
+    opacity: 1;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    font-weight: 500;
+  }
   .stats {
     display: flex;
     justify-content: space-around;
     padding: 15px;
-    background: #f8f9fa;
-    border-bottom: 2px solid #e9ecef;
+    background: #f1f3f5;
+    border-bottom: 2px solid #dee2e6;
   }
   .stat-box {
     text-align: center;
     padding: 10px 20px;
     border-radius: 10px;
-    background: #fff;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    background: #ffffff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     min-width: 100px;
+    border: 1px solid #e9ecef;
   }
-  .stat-box .label { font-size: 12px; color: #666; text-transform: uppercase; }
-  .stat-box .value { font-size: 22px; font-weight: bold; color: #f5576c; margin-top: 4px; }
+  .stat-box .label {
+    font-size: 12px;
+    color: #495057;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .stat-box .value {
+    font-size: 24px;
+    font-weight: 800;
+    color: #c92a2a;
+    margin-top: 4px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  }
   .progress-bar {
     height: 8px;
-    background: #e9ecef;
+    background: #dee2e6;
     position: relative;
   }
   .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+    background: linear-gradient(90deg, #1864ab 0%, #0b7285 100%);
     width: 0%;
     transition: width 0.4s ease;
   }
   .question-area { padding: 30px; min-height: 400px; }
   .question-tag {
     display: inline-block;
-    padding: 5px 14px;
+    padding: 6px 16px;
     border-radius: 20px;
-    font-size: 12px;
-    font-weight: bold;
-    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
     margin-bottom: 15px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    letter-spacing: 0.3px;
   }
-  .tag-theory { background: linear-gradient(135deg, #43cea2, #185a9d); }
-  .tag-easy { background: linear-gradient(135deg, #56ab2f, #a8e063); }
-  .tag-medium { background: linear-gradient(135deg, #f7971e, #ffd200); }
-  .tag-hard { background: linear-gradient(135deg, #cb2d3e, #ef473a); }
+  .tag-theory { background: linear-gradient(135deg, #099268, #1864ab); }
+  .tag-easy { background: linear-gradient(135deg, #2b8a3e, #5c940d); }
+  .tag-medium { background: linear-gradient(135deg, #e67700, #d9480f); }
+  .tag-hard { background: linear-gradient(135deg, #c92a2a, #862e9c); }
   .question-text {
     font-size: 17px;
-    line-height: 1.7;
+    line-height: 1.75;
     margin-bottom: 20px;
-    padding: 18px;
+    padding: 20px;
     background: #f8f9fa;
-    border-left: 5px solid #667eea;
+    border-left: 5px solid #364fc7;
     border-radius: 8px;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+    color: #000000;
+    font-weight: 500;
   }
+  .question-text strong { color: #1864ab; }
   .options { display: flex; flex-direction: column; gap: 12px; }
   .option {
     padding: 15px 20px;
-    background: #fff;
-    border: 2px solid #e0e0e0;
+    background: #ffffff;
+    border: 2px solid #ced4da;
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.25s ease;
-    font-size: 15px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+    font-size: 16px;
+    font-weight: 500;
+    color: #111111;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
     display: flex;
     align-items: center;
   }
   .option:hover:not(.disabled) {
     transform: translateX(5px);
-    border-color: #667eea;
-    background: #f0f4ff;
-    box-shadow: 0 5px 15px rgba(102,126,234,0.2);
+    border-color: #364fc7;
+    background: #e7f5ff;
+    box-shadow: 0 5px 15px rgba(54,79,199,0.25);
+    color: #000000;
   }
   .option .letter {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: #fff;
-    font-weight: bold;
+    background: linear-gradient(135deg, #364fc7, #862e9c);
+    color: #ffffff;
+    font-weight: 800;
     margin-right: 15px;
     flex-shrink: 0;
+    font-size: 15px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
   }
   .option.correct {
-    background: linear-gradient(135deg, #d4fc79, #96e6a1);
-    border-color: #28a745;
-    color: #155724;
+    background: linear-gradient(135deg, #b2f2bb, #69db7c);
+    border-color: #2b8a3e;
+    color: #052e13;
+    font-weight: 600;
+  }
+  .option.correct .letter {
+    background: #2b8a3e;
   }
   .option.wrong {
-    background: linear-gradient(135deg, #ffcccc, #ff9999);
-    border-color: #dc3545;
-    color: #721c24;
+    background: linear-gradient(135deg, #ffc9c9, #ff8787);
+    border-color: #c92a2a;
+    color: #490808;
+    font-weight: 600;
   }
-  .option.disabled { cursor: not-allowed; opacity: 0.85; }
+  .option.wrong .letter {
+    background: #c92a2a;
+  }
+  .option.disabled { cursor: not-allowed; opacity: 0.92; }
   .explanation {
     margin-top: 20px;
-    padding: 18px;
-    background: linear-gradient(135deg, #fff5e6, #ffe0b3);
-    border-left: 5px solid #f7971e;
+    padding: 20px;
+    background: linear-gradient(135deg, #fff3bf, #ffd8a8);
+    border-left: 5px solid #d9480f;
     border-radius: 8px;
-    font-size: 14px;
-    line-height: 1.7;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    font-size: 15px;
+    line-height: 1.75;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     display: none;
+    color: #3d2800;
+    font-weight: 500;
   }
   .explanation.show { display: block; animation: fadeIn 0.4s ease; }
-  .explanation strong { color: #d35400; }
+  .explanation strong { color: #a61e00; font-weight: 700; }
+  .explanation em { color: #5c3100; font-weight: 600; }
   @keyframes fadeIn { from {opacity:0; transform:translateY(-10px);} to {opacity:1; transform:translateY(0);} }
   .nav-buttons {
     display: flex;
     justify-content: space-between;
     padding: 20px 30px;
-    background: #f8f9fa;
-    border-top: 2px solid #e9ecef;
+    background: #f1f3f5;
+    border-top: 2px solid #dee2e6;
   }
   .btn {
     padding: 12px 28px;
     border: none;
     border-radius: 25px;
     font-size: 15px;
-    font-weight: bold;
+    font-weight: 700;
     cursor: pointer;
     transition: all 0.25s ease;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    color: #ffffff;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    letter-spacing: 0.3px;
   }
-  .btn-prev { background: linear-gradient(135deg, #a8c0ff, #3f2b96); color: #fff; }
-  .btn-next { background: linear-gradient(135deg, #4facfe, #00f2fe); color: #fff; }
-  .btn-reset { background: linear-gradient(135deg, #f093fb, #f5576c); color: #fff; }
-  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.25); }
+  .btn-prev { background: linear-gradient(135deg, #5c7cfa, #364fc7); }
+  .btn-next { background: linear-gradient(135deg, #1c7ed6, #0b7285); }
+  .btn-reset { background: linear-gradient(135deg, #e64980, #9c36b5); }
+  .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.3); }
   .btn:disabled { opacity: 0.4; cursor: not-allowed; }
   .result-screen {
     text-align: center;
@@ -190,51 +243,92 @@
   .result-screen h2 {
     font-size: 32px;
     margin-bottom: 15px;
-    background: linear-gradient(135deg, #f093fb, #f5576c);
+    background: linear-gradient(135deg, #d63384, #6f42c1);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    font-weight: 800;
   }
   .score-circle {
     width: 180px;
     height: 180px;
     margin: 20px auto;
     border-radius: 50%;
-    background: conic-gradient(#4facfe 0deg, #e9ecef 0deg);
+    background: conic-gradient(#1864ab 0deg, #dee2e6 0deg);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
     position: relative;
   }
   .score-inner {
     width: 150px;
     height: 150px;
     border-radius: 50%;
-    background: #fff;
+    background: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
   }
-  .score-inner .num { font-size: 40px; font-weight: bold; color: #667eea; }
-  .score-inner .lbl { font-size: 13px; color: #888; }
+  .score-inner .num {
+    font-size: 44px;
+    font-weight: 800;
+    color: #1864ab;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .score-inner .lbl {
+    font-size: 13px;
+    color: #343a40;
+    font-weight: 600;
+  }
   .category-summary {
     margin-top: 20px;
     text-align: left;
     padding: 20px;
     background: #f8f9fa;
     border-radius: 12px;
+    border: 1px solid #dee2e6;
   }
-  .category-summary h3 { margin-bottom: 12px; color: #667eea; }
+  .category-summary h3 {
+    margin-bottom: 12px;
+    color: #1864ab;
+    font-weight: 700;
+  }
   .cat-row {
     display: flex;
     justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px dashed #ddd;
+    padding: 10px 0;
+    border-bottom: 1px dashed #adb5bd;
+    color: #212529;
+    font-weight: 600;
+    font-size: 15px;
   }
-  /* Đảm bảo MathJax không bị tràn */
-  mjx-container { overflow-x: auto; max-width: 100%; }
+  .cat-row:last-child { border-bottom: none; }
+  .cat-row strong { color: #c92a2a; font-size: 16px; }
+
+  /* ===== MathJax: force high contrast ===== */
+  mjx-container {
+    color: #000000 !important;
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  mjx-container svg {
+    color: #000000 !important;
+  }
+  mjx-container[jax="SVG"][display="true"] {
+    color: #000000 !important;
+  }
+  /* Đảm bảo công thức trong box có nền màu vẫn đen rõ */
+  .question-text mjx-container,
+  .option mjx-container,
+  .explanation mjx-container {
+    color: #000000 !important;
+  }
+  .option.correct mjx-container,
+  .option.wrong mjx-container {
+    color: #000000 !important;
+  }
 </style>
 </head>
 <body>
@@ -260,7 +354,7 @@
         <div class="lbl">trên 14 câu</div>
       </div>
     </div>
-    <p id="finalMsg" style="font-size:16px; margin:15px 0; color:#555;"></p>
+    <p id="finalMsg" style="font-size:16px; margin:15px 0; color:#212529; font-weight:600;"></p>
     <div class="category-summary" id="categorySummary"></div>
     <button class="btn btn-reset" onclick="resetQuiz()" style="margin-top:20px;">🔄 Làm lại</button>
   </div>
@@ -515,7 +609,7 @@ function showResult() {
   const correct = userAnswers.filter((a,i) => a === questions[i].answer).length;
   document.getElementById('finalScore').textContent = correct;
   const pct = (correct/questions.length)*100;
-  document.getElementById('scoreCircle').style.background = `conic-gradient(#4facfe 0deg, #4facfe ${pct*3.6}deg, #e9ecef ${pct*3.6}deg)`;
+  document.getElementById('scoreCircle').style.background = `conic-gradient(#1864ab 0deg, #1864ab ${pct*3.6}deg, #dee2e6 ${pct*3.6}deg)`;
   let msg = '';
   if (pct >= 90) msg = '🌟 Xuất sắc! Bạn nắm rất vững kiến thức!';
   else if (pct >= 70) msg = '👍 Khá tốt! Ôn thêm phần sai là hoàn hảo.';
@@ -523,7 +617,6 @@ function showResult() {
   else msg = '📚 Hãy xem lại lý thuyết và làm thêm bài tập nhé!';
   document.getElementById('finalMsg').textContent = msg;
 
-  // Category summary
   const cats = {theory: {name: '📘 Lý thuyết', total: 0, correct: 0},
                 easy: {name: '🟢 Bài tập Dễ', total: 0, correct: 0},
                 medium: {name: '🟡 Bài tập Trung bình', total: 0, correct: 0},
